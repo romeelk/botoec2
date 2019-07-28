@@ -33,8 +33,10 @@ def check_key_pair_exists(name):
 
 region = 'eu-west-1'
 imageId = "ami-0862aabda3fb488b5"
-
+subnetId = "subnet-0e853e2305b84de2b"
+securityGroupId = "sg-bda895cc"
 ec2 = boto.ec2.connect_to_region(region)
+
 
 print("Connection to region, %s!" % region)
 
@@ -46,13 +48,18 @@ bootscript = file.read()
 
 create_key_pair()
 
+interface = boto.ec2.networkinterface.NetworkInterfaceSpecification(subnet_id=subnetId,
+                                                                    groups=[securityGroupId],
+                                                                    associate_public_ip_address=True)
+interfaces = boto.ec2.networkinterface.NetworkInterfaceCollection(interface)
+
 instances = ec2.run_instances(
      image_id=imageId,
      min_count=1,
      max_count=1,
      instance_type='t2.micro',
      key_name='ec2-keypairv2',
-     subnet_id="subnet-0e853e2305b84de2b",
-     user_data=bootscriptpath
+     user_data=bootscriptpath,
+     network_interfaces=interfaces
     )
 

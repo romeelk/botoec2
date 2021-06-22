@@ -1,37 +1,7 @@
 import boto.ec2
 import os
 import io
-
-
-def create_key_pair():
-
-    # if(os.path.exists('ec2-keypairv2.pem')):
-    #     print("Key file already exists!")
-    #     os.remove("ec2-keypairv2.pem")
-
-    # create a file to store the key locally
-    outfile = open('ec2-keypairv2.pem', 'w')
-
-    if(check_key_pair_exists("ec2-keypairv2")):
-          print("Key pair exists attached to ec2. deleting!")
-          ec2.delete_key_pair("ec2-keypairv2")
-
-    # call the boto ec2 function to create a key pair
-    key_pair = ec2.create_key_pair(key_name='ec2-keypairv2')
-
-    # capture the key and store it in a file
-    key_pair_out = str(key_pair.material)
-    outfile.write(key_pair_out)
-    outfile.close()
-
-
-def check_key_pair_exists(name):
-   key_pairs = ec2.get_all_key_pairs()
-   for key in key_pairs:
-       if(key.name == name):
-           return True
-   return False
-
+import keypair
 
 region = 'eu-west-1'
 imageId = "ami-0862aabda3fb488b5"
@@ -43,6 +13,8 @@ print("Current executing path %s" % os.path.realpath(__file__))
 
 ec2 = boto.ec2.connect_to_region(region)
 
+keypair = keypair.KeyPair(ec2,'ec2-keypairv2')
+
 print("Connecting to region, %s!" % region)
 
 currentworkingdir = os.path.abspath(os.path.dirname(__file__))
@@ -52,8 +24,7 @@ file = open(bootscriptpath, "r")
 bootscript = file.read()
 
 print("Creating key pair")
-
-create_key_pair()
+keypair.create_key_pair()
 
 interface = boto.ec2.networkinterface.NetworkInterfaceSpecification(subnet_id=subnetId,
                                                                     groups=[
@@ -66,7 +37,7 @@ instances = ec2.run_instances(
     min_count=1,
     max_count=1,
     instance_type='t2.micro',
-    key_name='ec2-keypairv2',
+    key_name='ec2-keypairv2.pem',
     user_data=bootscriptpath,
     network_interfaces=interfaces
 )

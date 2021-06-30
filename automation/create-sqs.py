@@ -6,6 +6,7 @@ queuename = "processing-queues"
 # create a boto3 client
 client = boto3.client('sqs')
 
+# Check if queue exists
 def check_queue_exists(queue):
     try:
         # create the test queue

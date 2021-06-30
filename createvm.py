@@ -5,7 +5,7 @@ import keypair
 
 region = 'eu-west-1'
 imageId = "ami-0862aabda3fb488b5"
-subnetId = "subnet-0e853e2305b84de2b"
+subnetId = "subnet-0d6a19e3fb731c836"
 securityGroupId = "sg-bda895cc"
 
  # current script path
